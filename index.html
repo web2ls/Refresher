@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <title>Lexicon app</title>
+    <link href="https://fonts.googleapis.com/css?family=Exo+2:300,400,700" rel="stylesheet">
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/core.css">
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>English Refresher</h1>
+      </header>
+
+      <section class="hero">
+        <nav>
+          <ul>
+            <li class="dictionary-btn">Словарь</li>
+            <li class="add-new-word-btn">Добавить слово</li>
+            <li class="test-btn">Тест</li>
+          </ul>
+        </nav>
+
+        <section class="content">
+          <div class="introduce">
+            Начните работу через панель навигации наверху экрана...
+          </div>
+
+          <div class="dictionary">
+            <div class="english-words">
+              <h2>Список</h2>
+              <ul class="words-list">
+                <li>torwards</li>
+                <li>to reach</li>
+              </ul>
+            </div>
+            <div class="translator">
+              <h2>Транслятор</h2>
+              <p class="translate-word"></p>
+            </div>
+          </div>
+
+          <div class="add-new-word">
+            <h2>Заполни форму нового слова</h2>
+            <form class="new-word-form">
+              <span>Английское слово</span>
+              <input class="new-english-word" type="text" required placeholder="Type english word here...">
+              <span>Перевод</span>
+              <input class="new-translate-word" type="text" required placeholder="Type translation here...">
+              <input class="submit-new-word-btn" type="submit" value="Добавить в словарь">
+            </form>
+          </div>
+
+          <div class="test">
+            <div class="test-word"></div>
+            <button class="show-right-answer-btn" type="button">Показать перевод</button>
+            <button class="show-next-word-btn" type="button"> >>> </button>
+            <div class="translated-word"></div>
+          </div>
+
+        </section>
+      </section>
+
+      <footer>
+        Powered by WebTools Store
+      </footer>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/4.1.3/firebase.js"></script>
+    <script src="js/core.js"></script>
+  </body>
+</html>
