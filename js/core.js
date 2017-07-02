@@ -6,16 +6,24 @@ window.onload = function() {
   const dictionaryBtn = document.querySelector('.dictionary-btn');
   const addNewWordBtn = document.querySelector('.add-new-word-btn');
   const testBtn = document.querySelector('.test-btn');
+  const toLearnedBtn = document.querySelector('.to-learned-btn');
+  const toNewBtn = document.querySelector('.to-new-btn');
   const showRightAnswerBtn = document.querySelector('.show-right-answer-btn');
   const showNextWordBtn = document.querySelector('.show-next-word-btn');
   const newWordForm = document.querySelector('.new-word-form');
   const wordsList = document.querySelector('.words-list');
+  const learnedWordsList = document.querySelector('.learned-words-list');
   const translateWord = document.querySelector('.translate-word');
   const testWord = document.querySelector('.test-word');
   const translatedWord = document.querySelector('.translated-word');
   let currentTestedWord = '';
   let lexicon = [];
+  let learnedLexicon = [];
   let currentScreen = 'introduce';
+  let currentSelectedWord = '';
+  let currentSelectedLearnedWord = '';
+  let isWordSelected = false;
+  let isLearnedWordSelected = false;
 
   const config = {
     apiKey: "AIzaSyDWjI8cK8rE-zDf3sRVKMLugxFrucvCzCE",
@@ -34,13 +42,22 @@ window.onload = function() {
 
   function getInitialData() {
     lexicon = [];
+    learnedLexicon = [];
     database.ref('dictionary').once('value')
     .then(snapshot => {
       const data = snapshot.val();
       for (let key in data) {
         lexicon.push(data[key]);
       };
-    })
+    });
+
+    database.ref('learnedDictionary').once('value')
+    .then(snapshot => {
+      const learnedData = snapshot.val();
+      for (let key in learnedData) {
+        learnedLexicon.push(learnedData[key]);
+      };
+    });
   };
 
   function createDictionaryHtml() {
@@ -50,18 +67,73 @@ window.onload = function() {
     wordsList.innerHTML = dictionaryHtml;
   };
 
+  function createLearnedDictionaryHtml() {
+    const learnedDictionaryHtml = learnedLexicon.map((item, i) => {
+      return `<li data-id='${item.id}'>${item.value}</li>`
+    }).join('');
+    learnedWordsList.innerHTML = learnedDictionaryHtml;
+  };
+
+  function getSelectedLearnedWord(event) {
+    if (event.target.nodeName !== 'LI') return;
+    console.log(event.target);
+    const wordId = event.target.getAttribute('data-id');
+    currentSelectedLearnedWord = learnedLexicon.filter(item => item.id === parseInt(wordId));
+    const allLearnedWords = document.querySelectorAll('.learned-words-list li');
+    allLearnedWords.forEach(item => {
+      if (item.classList.contains('selected-word')) {
+        item.classList.remove('selected-word');
+      }
+    });
+    event.target.classList.add('selected-word');
+    isLearnedWordSelected = true;
+  };
+
   function showDictionaryScreen() {
     test.style.display = 'none';
     introduceText.style.display = 'none';
     addNewWord.style.display = 'none';
     dictionary.style.display = 'flex';
     createDictionaryHtml();
+    createLearnedDictionaryHtml();
   };
 
   function showTranslation(event) {
+    if (event.target.nodeName !== 'LI') return;
     const wordId = event.target.getAttribute('data-id');
     const word = lexicon.filter(item => item.id === parseInt(wordId));
     translateWord.textContent = word[0].translation;
+    currentSelectedWord = word;
+    const allWords = document.querySelectorAll('.words-list li');
+    allWords.forEach(item => {
+      if (item.classList.contains('selected-word')) {
+        item.classList.remove('selected-word');
+      }
+    });
+    event.target.classList.add('selected-word');
+    isWordSelected = true;
+  };
+
+  function relocateWordToLearned() {
+    if (!isWordSelected) return;
+    learnedLexicon.push(currentSelectedWord[0]);
+    createLearnedDictionaryHtml();
+    database.ref('learnedDictionary/' + currentSelectedWord[0].id).set(currentSelectedWord[0]);
+    lexicon = lexicon.filter(item => item.id !== currentSelectedWord[0].id);
+    createDictionaryHtml();
+    database.ref('dictionary/' + currentSelectedWord[0].id).remove();
+    isWordSelected = false;
+  };
+
+  function relocateWordToNew() {
+    if (!isLearnedWordSelected) return;
+    lexicon.push(currentSelectedLearnedWord[0]);
+    learnedLexicon = learnedLexicon.filter(item => item.id !== currentSelectedLearnedWord[0].id);
+    createDictionaryHtml();
+    createLearnedDictionaryHtml();
+    database.ref('dictionary/' + currentSelectedLearnedWord[0].id).set(currentSelectedLearnedWord[0]);
+    database.ref('learnedDictionary/' + currentSelectedLearnedWord[0].id).remove();
+    isLearnedWordSelected = false;
   };
 
   function showAddNewWordScreen() {
@@ -130,6 +202,9 @@ window.onload = function() {
   showRightAnswerBtn.addEventListener('click', showRightAnswer);
   showNextWordBtn.addEventListener('click', showNextWord);
   wordsList.addEventListener('click', showTranslation);
+  toLearnedBtn.addEventListener('click', relocateWordToLearned);
+  toNewBtn.addEventListener('click', relocateWordToNew);
+  learnedWordsList.addEventListener('click', getSelectedLearnedWord);
 
   window.addEventListener('keyup', keyboardControl);
 
