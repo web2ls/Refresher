@@ -136,13 +136,21 @@ nav ul li:hover {
   text-decoration: underline;
 }
 
-.relocate-words {
-  transform: translateY(40%);
+.controlled-btn {
+  align-self: center;
+  transform: translateY(30%);
   margin: 0 10px;
+  text-align: center;
 }
 
+/*.relocate-words {
+  transform: translateY(40%);
+  margin: 0 10px;
+}*/
+
 .to-learned-btn,
-.to-new-btn {
+.to-new-btn,
+.delete-word-btn {
   margin-bottom: 15px;
   padding: 3px 5px;
   background: #2980b9;
@@ -157,7 +165,8 @@ nav ul li:hover {
 }
 
 .to-learned-btn:hover,
-.to-new-btn:hover {
+.to-new-btn:hover,
+.delete-word-btn:hover {
   box-shadow: 3px 3px 15px #057;
   color: #bdc3c7;
 }

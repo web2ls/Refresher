@@ -8,6 +8,7 @@ window.onload = function() {
   const testBtn = document.querySelector('.test-btn');
   const toLearnedBtn = document.querySelector('.to-learned-btn');
   const toNewBtn = document.querySelector('.to-new-btn');
+  const deleteWordBtn = document.querySelector('.delete-word-btn');
   const showRightAnswerBtn = document.querySelector('.show-right-answer-btn');
   const showNextWordBtn = document.querySelector('.show-next-word-btn');
   const newWordForm = document.querySelector('.new-word-form');
@@ -76,9 +77,9 @@ window.onload = function() {
 
   function getSelectedLearnedWord(event) {
     if (event.target.nodeName !== 'LI') return;
-    console.log(event.target);
     const wordId = event.target.getAttribute('data-id');
     currentSelectedLearnedWord = learnedLexicon.filter(item => item.id === parseInt(wordId));
+
     const allLearnedWords = document.querySelectorAll('.learned-words-list li');
     allLearnedWords.forEach(item => {
       if (item.classList.contains('selected-word')) {
@@ -87,6 +88,10 @@ window.onload = function() {
     });
     event.target.classList.add('selected-word');
     isLearnedWordSelected = true;
+
+    const allWords = document.querySelectorAll('.words-list li');
+    allWords.forEach(item => item.classList.remove('selected-word'));
+    isWordSelected = false;
   };
 
   function showDictionaryScreen() {
@@ -112,28 +117,50 @@ window.onload = function() {
     });
     event.target.classList.add('selected-word');
     isWordSelected = true;
+
+    const allLearnedWords = document.querySelectorAll('.learned-words-list li');
+    allLearnedWords.forEach(item => item.classList.remove('selected-word'));
+    isLearnedWordSelected = false;
   };
 
   function relocateWordToLearned() {
     if (!isWordSelected) return;
+    const wordId = currentSelectedWord[0].id;
     learnedLexicon.push(currentSelectedWord[0]);
+    lexicon = lexicon.filter(item => item.id !== wordId);
     createLearnedDictionaryHtml();
-    database.ref('learnedDictionary/' + currentSelectedWord[0].id).set(currentSelectedWord[0]);
-    lexicon = lexicon.filter(item => item.id !== currentSelectedWord[0].id);
     createDictionaryHtml();
-    database.ref('dictionary/' + currentSelectedWord[0].id).remove();
+    database.ref('learnedDictionary/' + wordId).set(currentSelectedWord[0]);
+    database.ref('dictionary/' + wordId).remove();
     isWordSelected = false;
   };
 
   function relocateWordToNew() {
     if (!isLearnedWordSelected) return;
+    const wordId = currentSelectedLearnedWord[0].id;
     lexicon.push(currentSelectedLearnedWord[0]);
-    learnedLexicon = learnedLexicon.filter(item => item.id !== currentSelectedLearnedWord[0].id);
+    learnedLexicon = learnedLexicon.filter(item => item.id !== wordId);
     createDictionaryHtml();
     createLearnedDictionaryHtml();
-    database.ref('dictionary/' + currentSelectedLearnedWord[0].id).set(currentSelectedLearnedWord[0]);
-    database.ref('learnedDictionary/' + currentSelectedLearnedWord[0].id).remove();
+    database.ref('dictionary/' + wordId).set(currentSelectedLearnedWord[0]);
+    database.ref('learnedDictionary/' + wordId).remove();
     isLearnedWordSelected = false;
+  };
+
+  function deleteWord() {
+    if (isWordSelected) {
+      const wordId = currentSelectedWord[0].id;
+      lexicon = lexicon.filter(item => item.id !== wordId);
+      createDictionaryHtml();
+      isWordSelected = false;
+      database.ref('dictionary/' + wordId).remove();
+    } else if (isLearnedWordSelected) {
+      const wordId = currentSelectedLearnedWord[0].id;
+      learnedLexicon = learnedLexicon.filter(item => item.id !== wordId);
+      createLearnedDictionaryHtml();
+      isLearnedWordSelected = false;
+      database.ref('learnedDictionary/' + wordId).remove();
+    }
   };
 
   function showAddNewWordScreen() {
@@ -204,6 +231,7 @@ window.onload = function() {
   wordsList.addEventListener('click', showTranslation);
   toLearnedBtn.addEventListener('click', relocateWordToLearned);
   toNewBtn.addEventListener('click', relocateWordToNew);
+  deleteWordBtn.addEventListener('click', deleteWord);
   learnedWordsList.addEventListener('click', getSelectedLearnedWord);
 
   window.addEventListener('keyup', keyboardControl);
