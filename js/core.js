@@ -6,6 +6,8 @@ window.onload = function() {
   const dictionaryBtn = document.querySelector('.dictionary-btn');
   const addNewWordBtn = document.querySelector('.add-new-word-btn');
   const testBtn = document.querySelector('.test-btn');
+  const newWordsQnt = document.querySelector('.new-words-qnt span');
+  const learnedWordsQnt = document.querySelector('.learned-words-qnt span');
   const toLearnedBtn = document.querySelector('.to-learned-btn');
   const toNewBtn = document.querySelector('.to-new-btn');
   const deleteWordBtn = document.querySelector('.delete-word-btn');
@@ -101,6 +103,7 @@ window.onload = function() {
     dictionary.style.display = 'flex';
     createDictionaryHtml();
     createLearnedDictionaryHtml();
+    getTotalQntWords();
   };
 
   function showTranslation(event) {
@@ -123,6 +126,11 @@ window.onload = function() {
     isLearnedWordSelected = false;
   };
 
+  function getTotalQntWords() {
+    newWordsQnt.textContent = lexicon.length;
+    learnedWordsQnt.textContent = learnedLexicon.length;
+  };
+
   function relocateWordToLearned() {
     if (!isWordSelected) return;
     const wordId = currentSelectedWord[0].id;
@@ -130,6 +138,7 @@ window.onload = function() {
     lexicon = lexicon.filter(item => item.id !== wordId);
     createLearnedDictionaryHtml();
     createDictionaryHtml();
+    getTotalQntWords();
     database.ref('learnedDictionary/' + wordId).set(currentSelectedWord[0]);
     database.ref('dictionary/' + wordId).remove();
     isWordSelected = false;
@@ -142,6 +151,7 @@ window.onload = function() {
     learnedLexicon = learnedLexicon.filter(item => item.id !== wordId);
     createDictionaryHtml();
     createLearnedDictionaryHtml();
+    getTotalQntWords();
     database.ref('dictionary/' + wordId).set(currentSelectedLearnedWord[0]);
     database.ref('learnedDictionary/' + wordId).remove();
     isLearnedWordSelected = false;
@@ -152,12 +162,14 @@ window.onload = function() {
       const wordId = currentSelectedWord[0].id;
       lexicon = lexicon.filter(item => item.id !== wordId);
       createDictionaryHtml();
+      getTotalQntWords();
       isWordSelected = false;
       database.ref('dictionary/' + wordId).remove();
     } else if (isLearnedWordSelected) {
       const wordId = currentSelectedLearnedWord[0].id;
       learnedLexicon = learnedLexicon.filter(item => item.id !== wordId);
       createLearnedDictionaryHtml();
+      getTotalQntWords();
       isLearnedWordSelected = false;
       database.ref('learnedDictionary/' + wordId).remove();
     }
