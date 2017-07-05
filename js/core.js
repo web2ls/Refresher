@@ -8,6 +8,10 @@ window.onload = function() {
   const testBtn = document.querySelector('.test-btn');
   const newWordsQnt = document.querySelector('.new-words-qnt span');
   const learnedWordsQnt = document.querySelector('.learned-words-qnt span');
+  const sortNewWordsBtn = document.querySelector('.sort-new-words-btn');
+  const sortDirectionSignElement = document.querySelector('.sort-new-words-btn span');
+  const sortDirectionSignLearnedElement = document.querySelector('.sort-learned-words-btn span');
+  const sortLearnedWordsBtn = document.querySelector('.sort-learned-words-btn');
   const toLearnedBtn = document.querySelector('.to-learned-btn');
   const toNewBtn = document.querySelector('.to-new-btn');
   const deleteWordBtn = document.querySelector('.delete-word-btn');
@@ -131,6 +135,54 @@ window.onload = function() {
     learnedWordsQnt.textContent = learnedLexicon.length;
   };
 
+  function sortNewWordsList() {
+    if (this.classList.contains('increase-sorting')) {
+      for (let i = lexicon.length; i; i--) {
+        let j = Math.floor(Math.random() * i);
+        [lexicon[i - 1], lexicon[j]] = [lexicon[j], lexicon[i - 1]];
+      };
+      this.classList.remove('increase-sorting');
+      createDictionaryHtml();
+      sortDirectionSignElement.innerHTML = '';
+    } else if (this.classList.contains('decrease-sorting')) {
+      lexicon.sort((a, b) => a.value < b.value ? 1 : -1);
+      createDictionaryHtml();
+      sortDirectionSignElement.innerHTML = '&uarr;';
+      this.classList.remove('decrease-sorting');
+      this.classList.add('increase-sorting');
+    } else {
+      lexicon.sort((a, b) => a.value > b.value ? 1 : -1);
+      createDictionaryHtml();
+      sortDirectionSignElement.innerHTML = '&darr;';
+      this.classList.remove('increase-sorting');
+      this.classList.add('decrease-sorting');
+    }
+  };
+
+  function sortLearnedWordsList() {
+    if (this.classList.contains('increase-sorting')) {
+      for (let i = learnedLexicon.length; i; i--) {
+        let j = Math.floor(Math.random() * i);
+        [learnedLexicon[i - 1], learnedLexicon[j]] = [learnedLexicon[j], learnedLexicon[i - 1]];
+      };
+      this.classList.remove('increase-sorting');
+      createLearnedDictionaryHtml();
+      sortDirectionSignLearnedElement.innerHTML = '';
+    } else if (this.classList.contains('decrease-sorting')) {
+      learnedLexicon.sort((a, b) => a.value < b.value ? 1 : -1);
+      createLearnedDictionaryHtml();
+      sortDirectionSignLearnedElement.innerHTML = '&uarr;';
+      this.classList.remove('decrease-sorting');
+      this.classList.add('increase-sorting');
+    } else {
+      learnedLexicon.sort((a, b) => a.value > b.value ? 1 : -1);
+      createLearnedDictionaryHtml();
+      sortDirectionSignLearnedElement.innerHTML = '&darr;';
+      this.classList.remove('increase-sorting');
+      this.classList.add('decrease-sorting');
+    }
+  };
+
   function relocateWordToLearned() {
     if (!isWordSelected) return;
     const wordId = currentSelectedWord[0].id;
@@ -240,6 +292,8 @@ window.onload = function() {
   newWordForm.addEventListener('submit', saveNewWord);
   showRightAnswerBtn.addEventListener('click', showRightAnswer);
   showNextWordBtn.addEventListener('click', showNextWord);
+  sortNewWordsBtn.addEventListener('click', sortNewWordsList);
+  sortLearnedWordsBtn.addEventListener('click', sortLearnedWordsList);
   wordsList.addEventListener('click', showTranslation);
   toLearnedBtn.addEventListener('click', relocateWordToLearned);
   toNewBtn.addEventListener('click', relocateWordToNew);
